@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#c3e4f7" stroke="#abdaf4" stroke-width="1.5"/>
+  <g transform="translate(100, 60)" text-anchor="middle">
+    <path d="M -48 -14 C -42 -18, -42 -8, -48 -6 C -54 -4, -54 4, -48 2" stroke="#122e40" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <text x="5" y="-1" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="19" fill="#122e40" letter-spacing="1">SEAGULL</text>
+    <text x="0" y="14" font-family="'Helvetica Neue', Arial, sans-serif" font-size="6.5" font-weight="600" fill="#3a5f78" letter-spacing="3">LABORATORY</text>
+  </g>
+</svg>

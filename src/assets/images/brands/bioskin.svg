@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#f4f8f4" stroke="#e0ece0" stroke-width="1.5"/>
+  <g transform="translate(100, 52)" text-anchor="middle">
+    <text x="-8" y="2" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="20" fill="#1c281f">Bio Skin</text>
+    <path d="M18 -14 C24 -20, 32 -16, 30 -6 C28 2, 18 -2, 18 -14 Z" fill="#8cb232"/>
+    <path d="M21 -10 C28 -14, 34 -8, 32 0 C28 4, 21 0, 21 -10 Z" fill="#719822"/>
+    <text x="0" y="18" font-family="'Helvetica Neue', Arial, sans-serif" font-size="7.5" font-weight="500" fill="#667768" letter-spacing="0.5">Back to Nature  Plus</text>
+  </g>
+</svg>

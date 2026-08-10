@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#f0f2f3" stroke="#e1e5e8" stroke-width="1.5"/>
+  <g transform="translate(100, 60)" text-anchor="middle">
+    <text x="0" y="-10" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="500" font-size="11" fill="#4a5056">Ardene<tspan font-size="7" dy="-4">®</tspan></text>
+    <text x="0" y="11" font-family="'Arial Black', 'Helvetica Neue', sans-serif" font-weight="900" font-size="20" fill="#11171d" letter-spacing="0.5">SEBUMA</text>
+  </g>
+</svg>

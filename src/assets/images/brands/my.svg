@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#ffffff" stroke="#f0e2e2" stroke-width="1.5"/>
+  <circle cx="112" cy="60" r="22" fill="#ebc2c0" opacity="0.65"/>
+  <text x="96" y="70" font-family="'Playfair Display', 'Baskerville', 'Times New Roman', serif" font-style="italic" font-weight="700" font-size="36" fill="#1a1415" text-anchor="middle">MY</text>
+</svg>

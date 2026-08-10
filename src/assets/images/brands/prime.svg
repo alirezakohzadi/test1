@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#5c6a62" stroke="#4d5a52" stroke-width="1.5"/>
+  <g transform="translate(100, 60)" text-anchor="middle">
+    <rect x="-42" y="-18" width="3" height="18" fill="#d9ad38"/>
+    <text x="0" y="-1" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="21" fill="#e8eee9" letter-spacing="1">PRIME</text>
+    <text x="0" y="13" font-family="'Helvetica Neue', Arial, sans-serif" font-size="6.5" font-weight="600" fill="#b0beba" letter-spacing="3">SKIN CARE</text>
+  </g>
+</svg>

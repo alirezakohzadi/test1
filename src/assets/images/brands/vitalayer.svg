@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#a8cad6" stroke="#90b8c6" stroke-width="1.5"/>
+  <g transform="translate(100, 65)" text-anchor="middle">
+    <path d="M -48 -8 C -44 -16, -34 -13, -36 -4 C -38 4, -48 1, -48 -8 Z" fill="#eac134"/>
+    <text x="6" y="0" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="20" fill="#1e2c33">Vitalayer<tspan font-size="8" dy="-8">®</tspan></text>
+  </g>
+</svg>

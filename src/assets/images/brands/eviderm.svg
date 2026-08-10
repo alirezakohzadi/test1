@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#fcf8ec" stroke="#f0e8d2" stroke-width="1.5"/>
+  <g transform="translate(100, 60)" text-anchor="middle">
+    <text x="0" y="0" font-family="'Times New Roman', 'Cinzel', serif" font-weight="600" font-size="21" fill="#1a1815" letter-spacing="2">EVIDERM</text>
+    <text x="0" y="14" font-family="'Helvetica Neue', Arial, sans-serif" font-size="6.5" font-weight="600" fill="#8c826b" letter-spacing="1.8">DERMOCOSMETIC</text>
+  </g>
+</svg>

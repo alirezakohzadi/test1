@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#b9d8c2" stroke="#a3caba" stroke-width="1.5"/>
+  <path d="M 52 50 Q 90 38, 148 52 C 120 46, 70 48, 52 50 Z" fill="#1b2a21"/>
+  <text x="100" y="68" font-family="'Times New Roman', serif" font-weight="700" font-size="23" fill="#0d1812" text-anchor="middle" letter-spacing="1">FULICA</text>
+</svg>

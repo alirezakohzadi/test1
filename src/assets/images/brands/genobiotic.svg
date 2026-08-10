@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <ellipse cx="100" cy="60" rx="72" ry="36" fill="#e3dacb" stroke="#d5c8b5" stroke-width="1.5"/>
+  <g transform="translate(100, 58)" text-anchor="middle">
+    <text x="0" y="2" font-family="'Georgia', serif" font-weight="700" font-size="21" fill="#1c1610">Geno<tspan font-size="8" dy="-8">®</tspan></text>
+    <text x="0" y="16" font-family="'Helvetica Neue', Arial, sans-serif" font-size="7.5" font-weight="700" fill="#605445" letter-spacing="3.5">BIOTIC</text>
+  </g>
+</svg>
