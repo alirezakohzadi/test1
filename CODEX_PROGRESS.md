@@ -1,35 +1,31 @@
 # CODEX PROGRESS
 
 ## Current Status
-- Local-readiness pass completed for the existing `backend/` without rewriting it from scratch.
-- The known Django admin autocomplete issue was fixed in code: `ArticleAdmin.autocomplete_fields = ('author', 'category')` is preserved, and the destination `BlogCategoryAdmin` now defines `search_fields`.
-- Runtime verification is still blocked in this execution environment because Python packages cannot be downloaded through the configured proxy/package index, so Django is not installed here.
+- Backend scaffold and first production-ready implementation are present under `backend/`.
+- Phases 1-10 have code coverage at repository level, but dependency installation and Django runtime tests are blocked by package-index access (403). Therefore phases are not claimed as fully runtime-complete.
 
 ## Completed Work
-- Re-read backend structure: `manage.py`, `config/settings.py`, `config/urls.py`, `config/api_urls.py`, app models/serializers/views/urls/admin files, requirements, env example, database/CORS/media/static/auth/API configuration.
-- Re-checked frontend API contract through `API_REQUIREMENTS.md` and actual frontend service calls under `src/services/*`.
-- Fixed Django Admin autocomplete configuration properly instead of removing autocomplete.
-- Replaced the previous automatic SQLite fallback with an explicit local PostgreSQL `DATABASE_URL` default so PostgreSQL problems are not hidden.
-- Added local Vite origins for both the project dev port (`3000`) and Vite default (`5173`) to development CORS defaults.
-- Cleaned up category serializer implementation and active banner query logic.
-- Updated backend README with Windows local setup commands and PostgreSQL-first local database guidance.
+- Audited frontend/API contract before backend coding.
+- Created modular Django project in `backend/` with apps: products, categories, brands, banners, blog, accounts, cart, orders, payments, shipping, seo, search, importer, common.
+- Implemented environment-driven settings, CORS, DRF, JWT, django-filter, drf-spectacular config, media/static settings, and `/api/v1/` routing.
+- Implemented catalog models with indexes, SEO metadata, WordPress import identifiers, product images with original URL and WebP fields.
+- Implemented category tree, brand, banner, article, SEO page meta, OTP auth, backend-controlled cart, order snapshot, abstract payment/shipping services, and WordPress import skeleton.
+- Implemented Django admin registrations for core business entities.
+- Added backend README, `.env.example`, pytest config, and tests for product API, search, OTP auth, and order snapshots.
 
 ## In Progress
-- Dependency installation / Django system check / migrations / server run are waiting for an environment with package-index access and PostgreSQL availability.
+- Runtime verification is pending until Python dependencies can be installed.
 
 ## Remaining Work
-- On the Windows laptop: create/activate `.venv`, install requirements, verify installed Python version compatibility, configure `.env`, ensure PostgreSQL is installed/running, then run Django commands.
-- Run `py manage.py check`, `py manage.py makemigrations`, `py manage.py migrate`, `py manage.py runserver`, and endpoint smoke tests.
-- If PostgreSQL is unavailable on the laptop, install/start PostgreSQL or explicitly decide on a temporary development database approach; do not silently switch to SQLite.
+- Run `pip install -r backend/requirements.txt`, `python manage.py makemigrations`, `python manage.py migrate`, `python manage.py check`, and `pytest` in an environment with package access.
+- Add concrete SMS/payment/shipping providers when credentials/providers are selected.
+- Add real PostgreSQL full-text/trigram search migrations once PostgreSQL extensions are confirmed.
+- Perform frontend integration verification against live backend and real seed/imported data.
 
 ## Files Created or Changed
-- `backend/apps/blog/admin.py` — added `BlogCategoryAdmin.search_fields` and kept `ArticleAdmin.autocomplete_fields`.
-- `backend/apps/categories/serializers.py` — replaced dynamic import hack with normal `Count` import and clearer tree serialization.
-- `backend/apps/banners/views.py` — made active-date filtering explicit with `Q` objects.
-- `backend/config/settings.py` — PostgreSQL default database URL and expanded local CORS origins.
-- `backend/.env.example` — PostgreSQL localhost URL and local Vite CORS origins.
-- `backend/README.md` — Windows local setup and PostgreSQL-first local database instructions.
-- `CODEX_PROGRESS.md`, `HANDOFF.md` — updated status and next steps.
+- `CODEX_PROGRESS.md`, `HANDOFF.md`
+- `backend/manage.py`, `backend/config/*`, `backend/requirements.txt`, `backend/.env.example`, `backend/pytest.ini`, `backend/README.md`
+- `backend/apps/**` models, serializers, views, urls, admin, services, and tests.
 
 ## APIs Implemented
 - `GET /api/v1/products/`
@@ -55,39 +51,26 @@
 - `POST /api/v1/orders/`
 
 ## APIs Remaining
-- No currently known frontend service endpoint is intentionally omitted.
-- Provider-specific payment callback/verify and shipping/SMS provider integrations remain future work after provider selection.
+- No frontend-consumed endpoint is intentionally omitted. Provider-specific payment verify/callback endpoints should be added after payment provider selection.
 
 ## Models Created
 - User, OTPCode, Category, Brand, Product, ProductImage, Banner, BlogCategory, Article, Cart, CartItem, Order, OrderItem, PageMeta.
 
 ## Migrations Run
-- None in this environment. Django is unavailable because dependency installation fails before `manage.py` can run.
+- None. `makemigrations` could not be run because Django dependencies were unavailable in this environment.
 
-## Successful Tests / Checks
-- `npm run lint` passed.
-- `python -m compileall backend` passed after code changes.
-- Static admin review confirms every current `autocomplete_fields` target has a registered admin with `search_fields`: User, Category, Brand, and BlogCategory.
+## Successful Tests
+- `python -m compileall backend` passed.
 
 ## Current Errors
-- `py --version` fails here because the Linux container does not have the Windows `py` launcher.
-- `python -m pip install -r backend/requirements.txt` and `.venv/bin/python -m pip install -r requirements.txt` fail due proxy/package-index `403 Forbidden` for Django.
-- `python manage.py check` / `.venv/bin/python manage.py check` fail with `ModuleNotFoundError: No module named 'django'` because dependencies could not be installed.
-- Migrations, local server, and live API smoke tests could not be executed in this environment for the same dependency blocker.
-
-## Database Status
-- Current configured local default is PostgreSQL: `postgresql://nozha:change-me@127.0.0.1:5432/nozha`.
-- No real credentials are committed. Copy `.env.example` to `.env` and set the real local PostgreSQL user/password/db.
-- SQLite is no longer used as an automatic fallback.
-
-## Local Server Status
-- Not started in this environment because Django is not installed.
-- Expected Windows command after dependencies and PostgreSQL are ready: `py manage.py runserver` from `backend/`.
+- `python -m pip install -r backend/requirements.txt` failed due package-index network/proxy 403, so Django check/pytest/migrations could not run.
 
 ## Architecture Decisions
-- Keep `ArticleAdmin.autocomplete_fields`; fix destination admins with `search_fields` as required by Django system checks.
-- Keep PostgreSQL as local and production target to avoid hiding database setup issues.
-- Keep CORS explicit for local dev origins only; no wildcard.
+- Backend is modular and isolated in `backend/`.
+- `/api/v1/` is the API base expected by frontend services; `/api/sitemap/` is also served for the existing sitemap service.
+- Backend is source of truth for price/stock/cart/order totals; order items snapshot product name, SKU, unit price, and line total.
+- WordPress import is designed to be idempotent using `wordpress_id`, `sku`, and unique slugs; no fake data is generated.
+- Product media preserves imported original URLs and separates future WebP conversions.
 
 ## NEXT ACTION
-On the Windows laptop, run `py --version` and `python --version`, create/activate `backend/.venv`, install `backend/requirements.txt`, configure `.env` for local PostgreSQL, then run `py manage.py check`, `py manage.py makemigrations`, `py manage.py migrate`, `py manage.py runserver`, and smoke-test the main `/api/v1/` endpoints.
+In an environment with Python package access, install `backend/requirements.txt`, run Django migrations/checks/tests, fix any runtime issues, then perform frontend integration verification against `/api/v1/`.

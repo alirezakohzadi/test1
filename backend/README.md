@@ -3,41 +3,27 @@
 Production-oriented Django REST Framework backend for the existing Persian/RTL Vite React storefront.
 
 ## Installation
-
-### Windows local development
-```powershell
-cd backend
-py --version
-python --version
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-### macOS/Linux
 ```bash
 cd backend
 python -m venv .venv
 . .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Environment
 Copy `.env.example` to `.env` and configure `SECRET_KEY`, `DATABASE_URL`, Redis, CORS origins, media paths, SMS, payment, and shipping provider variables. No real credentials are stored in the repository.
 
 ## Database
-PostgreSQL is the configured database for local and production use. Create the database/user referenced by `DATABASE_URL` before running migrations; do not silently switch to SQLite when PostgreSQL is missing.
+PostgreSQL is recommended for production and large catalog search. SQLite can be used locally through the default fallback.
 ```bash
-py manage.py makemigrations
-py manage.py migrate
-py manage.py createsuperuser
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
 ```
 
 ## Run
 ```bash
-py manage.py runserver
+python manage.py runserver 0.0.0.0:8000
 ```
 Frontend should use `VITE_DJANGO_API_URL=http://localhost:8000/api`.
 
@@ -48,10 +34,8 @@ Swagger/OpenAPI: `/api/docs/`, schema: `/api/schema/`.
 
 ## Testing
 ```bash
-py manage.py check
-py manage.py makemigrations --check
-py manage.py migrate
 pytest
+python manage.py check
 ```
 
 ## Media and WebP

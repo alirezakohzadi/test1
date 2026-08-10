@@ -12,12 +12,12 @@ INSTALLED_APPS = [
  'apps.common','apps.categories','apps.brands','apps.products','apps.banners','apps.blog','apps.accounts','apps.cart','apps.orders','apps.payments','apps.shipping','apps.seo','apps.search','apps.importer']
 MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware','django.middleware.security.SecurityMiddleware','django.contrib.sessions.middleware.SessionMiddleware','django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware','django.contrib.auth.middleware.AuthenticationMiddleware','django.contrib.messages.middleware.MessageMiddleware','django.middleware.clickjacking.XFrameOptionsMiddleware']
 ROOT_URLCONF='config.urls'; WSGI_APPLICATION='config.wsgi.application'; ASGI_APPLICATION='config.asgi.application'
-DATABASES={'default': dj_database_url.config(default=config('DATABASE_URL', default='postgresql://nozha:change-me@127.0.0.1:5432/nozha'), conn_max_age=600)}
+DATABASES={'default': dj_database_url.config(default=config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'), conn_max_age=600)}
 LANGUAGE_CODE='fa-ir'; TIME_ZONE='Asia/Tehran'; USE_I18N=True; USE_TZ=True
 STATIC_URL='static/'; STATIC_ROOT=BASE_DIR/'staticfiles'; MEDIA_URL=config('MEDIA_URL', default='/media/'); MEDIA_ROOT=config('MEDIA_ROOT', default=str(BASE_DIR/'media'))
 DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
 AUTH_USER_MODEL='accounts.User'
-CORS_ALLOWED_ORIGINS=config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173', cast=Csv())
+CORS_ALLOWED_ORIGINS=config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000', cast=Csv())
 REST_FRAMEWORK={'DEFAULT_SCHEMA_CLASS':'drf_spectacular.openapi.AutoSchema','DEFAULT_AUTHENTICATION_CLASSES':['rest_framework_simplejwt.authentication.JWTAuthentication','rest_framework.authentication.SessionAuthentication'],'DEFAULT_FILTER_BACKENDS':['django_filters.rest_framework.DjangoFilterBackend','rest_framework.filters.SearchFilter','rest_framework.filters.OrderingFilter'],'DEFAULT_PAGINATION_CLASS':'apps.common.pagination.StandardResultsSetPagination','PAGE_SIZE':12}
 SIMPLE_JWT={'ACCESS_TOKEN_LIFETIME':timedelta(minutes=config('JWT_ACCESS_MINUTES', default=60, cast=int)),'REFRESH_TOKEN_LIFETIME':timedelta(days=config('JWT_REFRESH_DAYS', default=14, cast=int))}
 SPECTACULAR_SETTINGS={'TITLE':'NozhaShop API','DESCRIPTION':'Django REST API for Persian RTL pharmacy storefront','VERSION':'1.0.0'}
