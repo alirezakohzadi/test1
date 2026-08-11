@@ -8,6 +8,7 @@ import {
   Article,
   DjangoBanner,
 } from '../types';
+import { resolveMediaUrl } from '../utils/media';
 
 /**
  * Maps Django REST API Product object to UI Product interface
@@ -19,7 +20,7 @@ export function mapDjangoProductToUI(item: DjangoProduct): Product {
     name: item.name,
     brand: item.brand?.name || item.brand?.persian_name || '',
     category: item.category?.name || '',
-    image: item.image_url,
+    image: resolveMediaUrl(item.image_url),
     price: item.price,
     originalPrice: item.original_price,
     discountPercentage: item.discount_percentage,
@@ -38,7 +39,7 @@ export function mapDjangoProductToUI(item: DjangoProduct): Product {
     seoTitle: item.seo_title,
     seoDescription: item.seo_description,
     canonicalUrl: item.canonical_url,
-    ogImage: item.og_image,
+    ogImage: resolveMediaUrl(item.og_image),
     metaKeywords: item.meta_keywords,
     schemaJson: item.schema_json,
   };
@@ -52,12 +53,13 @@ export function mapDjangoBrandToUI(item: DjangoBrand): Brand {
     id: String(item.id),
     name: item.name,
     persianName: item.persian_name || item.name,
-    logo: item.logo_url || '',
+    slug: item.slug,
+    logo: resolveMediaUrl(item.logo_url),
     description: item.description,
     seoTitle: item.seo_title,
     seoDescription: item.seo_description,
     canonicalUrl: item.canonical_url,
-    ogImage: item.og_image,
+    ogImage: resolveMediaUrl(item.og_image),
   };
 }
 
@@ -70,18 +72,18 @@ export function mapDjangoArticleToUI(item: DjangoArticle): Article {
     title: item.title,
     summary: item.summary,
     content: item.content,
-    image: item.image_url,
+    image: resolveMediaUrl(item.image_url),
     category: item.category_name,
     date: item.published_at,
     readTime: item.read_time,
     authorName: item.author?.name,
     authorRole: item.author?.role,
-    authorAvatar: item.author?.avatar_url,
+    authorAvatar: resolveMediaUrl(item.author?.avatar_url),
     slug: item.slug,
     seoTitle: item.seo_title,
     seoDescription: item.seo_description,
     canonicalUrl: item.canonical_url,
-    ogImage: item.og_image,
+    ogImage: resolveMediaUrl(item.og_image),
     datePublished: item.published_at,
     dateModified: item.updated_at,
     metaKeywords: item.meta_keywords,

@@ -8,7 +8,7 @@ export const seoService = {
    */
   async getSEOPageMeta(pagePath: string): Promise<Partial<SEOData> | null> {
     try {
-      return await apiClient.get<Partial<SEOData>>('/v1/seo/meta/', { path: pagePath });
+      return await apiClient.get<Partial<SEOData>>('/seo/meta/', { path: pagePath });
     } catch {
       return null;
     }

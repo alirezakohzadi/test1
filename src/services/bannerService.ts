@@ -1,5 +1,6 @@
 import { apiClient } from './apiClient';
 import { DjangoBanner } from '../types';
+import { resolveMediaUrl } from '../utils/media';
 
 export const bannerService = {
   /**
@@ -7,6 +8,12 @@ export const bannerService = {
    */
   async getBanners(position?: DjangoBanner['position']): Promise<DjangoBanner[]> {
     const params = position ? { position } : undefined;
-    return await apiClient.get<DjangoBanner[]>('/v1/banners/', params);
+    const response = await apiClient.get<DjangoBanner[] | { results: DjangoBanner[] }>('/banners/', params);
+    const banners = Array.isArray(response) ? response : response.results || [];
+    return banners.map((banner) => ({
+      ...banner,
+      image_url: resolveMediaUrl(banner.image_url),
+      mobile_image_url: resolveMediaUrl(banner.mobile_image_url),
+    }));
   },
 };

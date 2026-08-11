@@ -55,6 +55,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 }) => {
   // Filter States
   const [searchQuery, setSearchQuery] = useState<string>(initialQuery);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand);
   const [minPrice, setMinPrice] = useState<number | ''>('');
@@ -104,6 +105,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     }
   };
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setCurrentPage(1);
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
+
   // Master Products Fetcher from API Service
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -112,7 +121,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       const response = await productService.getProducts({
         page: currentPage,
         page_size: pageSize,
-        search: searchQuery || undefined,
+        search: debouncedSearchQuery || undefined,
         category_slug: selectedCategory || undefined,
         brand_slug: selectedBrand || undefined,
         min_price: minPrice !== '' ? Number(minPrice) : undefined,
@@ -133,7 +142,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   }, [
     currentPage,
     pageSize,
-    searchQuery,
+    debouncedSearchQuery,
     selectedCategory,
     selectedBrand,
     minPrice,
@@ -625,11 +634,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={b.id || b.name}
                     onClick={() => {
-                      setSelectedBrand(b.name === selectedBrand ? '' : b.name);
+                      setSelectedBrand(b.slug === selectedBrand ? '' : b.slug || b.name);
                       handleFilterChange();
                     }}
                     className={`w-full text-right px-2.5 py-1.5 rounded-xl font-bold transition-all flex items-center justify-between cursor-pointer ${
-                      selectedBrand === b.name ? 'bg-emerald-50 text-[#0D7366]' : 'text-slate-600 hover:bg-slate-50'
+                      selectedBrand === (b.slug || b.name) ? 'bg-emerald-50 text-[#0D7366]' : 'text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <span className="truncate">{b.name}</span>
