@@ -2,11 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-import facedouxBanner from '../assets/images/banners/hero-banner-01.jpg';
-import ardeneBanner from '../assets/images/banners/hero-banner-02.jpg';
-import primeBanner from '../assets/images/banners/hero-banner-03.jpg';
-import sebyctaBanner from '../assets/images/banners/hero-banner-04.jpg';
-import hydrodermBanner from '../assets/images/banners/hero-banner-05.jpg';
 import { bannerService } from '../services/bannerService';
 
 interface HeroSectionProps {
@@ -16,22 +11,22 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreProducts, onNavigateCategory }) => {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [slides, setSlides] = useState([
-    { id: '1', title: 'آردن سبوما', slug: 'ardene-sebuma', bgImage: ardeneBanner },
-    { id: '2', title: 'پرایم ماتکس', slug: 'prime-matex', bgImage: primeBanner },
-    { id: '3', title: 'سبیکتا هیدرا', slug: 'sebycta-skin-hydra', bgImage: sebyctaBanner },
-    { id: '4', title: 'هیدرودرم بادی اسپلش', slug: 'hydroderm-body-splash', bgImage: hydrodermBanner },
-  ]);
+  const [slides, setSlides] = useState<Array<{ id: string; title: string; slug: string; bgImage: string }>>([]);
+  const [sideBanner, setSideBanner] = useState<{ title: string; slug: string; image: string } | null>(null);
 
   useEffect(() => {
-    bannerService.getBanners('hero').then((banners) => {
+    Promise.all([bannerService.getBanners('hero'), bannerService.getBanners('sidebar')]).then(([banners, sidebar]) => {
+      if (sidebar && sidebar.length > 0) {
+        const b = sidebar[0];
+        setSideBanner({ title: b.title, slug: b.link_url || 'shop', image: b.mobile_image_url || b.image_url });
+      }
       if (banners && banners.length > 0) {
         setSlides(
           banners.map((b) => ({
             id: String(b.id),
             title: b.title,
             slug: b.link_url ? b.link_url.replace('/categories/', '').replace('/brands/', '') : 'shop',
-            bgImage: b.image_url,
+            bgImage: b.mobile_image_url || b.image_url,
           }))
         );
       }
@@ -44,6 +39,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreProducts, onN
     }, 5000);
     return () => clearInterval(timer);
   }, [slides.length]);
+
+  if (slides.length === 0 && !sideBanner) return null;
 
   return (
     <section className="w-full mb-8 pt-2 sm:pt-3">
@@ -58,12 +55,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreProducts, onN
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            onClick={() => onNavigateCategory ? onNavigateCategory('facedoux') : onExploreProducts()}
+            onClick={() => sideBanner ? onNavigateCategory?.(sideBanner.slug) : onExploreProducts()}
             className="w-full sm:w-[30%] lg:w-[28%] h-[150px] sm:h-[270px] lg:h-[320px] rounded-xl sm:rounded-2xl overflow-hidden relative group cursor-pointer"
           >
             <img
-              src={facedouxBanner}
-              alt="فیس دوکس ضد آفتاب"
+              src={sideBanner?.image || slides[0]?.bgImage}
+              alt={sideBanner?.title || slides[0]?.title || "بنر"}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -83,12 +80,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreProducts, onN
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
-                onClick={() => onNavigateCategory ? onNavigateCategory(slides[activeSlide].slug) : onExploreProducts()}
+                onClick={() => slides[activeSlide] && (onNavigateCategory ? onNavigateCategory(slides[activeSlide].slug) : onExploreProducts())}
                 className="absolute inset-0 cursor-pointer"
               >
                 <img
-                  src={slides[activeSlide].bgImage}
-                  alt={slides[activeSlide].title}
+                  src={slides[activeSlide]?.bgImage}
+                  alt={slides[activeSlide]?.title || 'بنر'}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

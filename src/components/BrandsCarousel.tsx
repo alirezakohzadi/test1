@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { BRANDS } from '../data/mockData';
 import { Brand } from '../types';
 import { brandService } from '../services/brandService';
 
@@ -11,7 +10,7 @@ interface BrandsCarouselProps {
 
 export const BrandsCarousel: React.FC<BrandsCarouselProps> = ({ onSelectBrand }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [brandsList, setBrandsList] = useState<Brand[]>(BRANDS);
+  const [brandsList, setBrandsList] = useState<Brand[]>([]);
 
   useEffect(() => {
     brandService.getBrands().then((res) => {

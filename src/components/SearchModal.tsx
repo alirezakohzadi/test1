@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, X, ShoppingBag, Sparkles, Star, Loader2 } from 'lucide-react';
+import { Search, X, ShoppingBag, Sparkles, Star, Loader2, RefreshCw } from 'lucide-react';
 import { Product } from '../types';
 import { searchService } from '../services/searchService';
 
@@ -24,30 +24,25 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!searchTerm.trim()) {
       setSearchResults([]);
       setLoading(false);
+      setError(false);
       return;
     }
 
     const timer = setTimeout(async () => {
       setLoading(true);
+      setError(false);
       try {
         const res = await searchService.globalSearch(searchTerm);
         setSearchResults(res.products);
       } catch {
-        // Local fallback
-        const q = searchTerm.toLowerCase();
-        setSearchResults(
-          products.filter(
-            (p) =>
-              p.name.toLowerCase().includes(q) ||
-              p.brand.toLowerCase().includes(q) ||
-              p.category.toLowerCase().includes(q)
-          )
-        );
+        setSearchResults([]);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -152,7 +147,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                     )}
                   </div>
 
-                  {filteredProducts.length === 0 ? (
+                  {error ? (
+                    <div className="py-12 text-center text-rose-500">
+                      <p className="text-sm font-bold mb-3">خطا در دریافت نتایج جستجو.</p>
+                      <button onClick={() => setSearchTerm((q) => q + ' ')} className="inline-flex items-center gap-1 text-xs font-bold underline"><RefreshCw className="w-3 h-3" /> تلاش مجدد</button>
+                    </div>
+                  ) : filteredProducts.length === 0 ? (
                     <div className="py-12 text-center text-slate-400">
                       <p className="text-sm">محصولی با مشخصات «{searchTerm}» پیدا نشد.</p>
                       <p className="text-xs mt-1 text-slate-400">

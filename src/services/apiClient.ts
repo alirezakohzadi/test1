@@ -11,7 +11,7 @@ const getApiBaseUrl = (): string => {
     return envUrl.endsWith('/') ? envUrl.slice(0, -1) : envUrl;
   }
 
-  return 'http://localhost:8000/api';
+  return 'http://127.0.0.1:8000/api/v1';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

@@ -38,46 +38,26 @@ import {
   generateCollectionPageSchema,
   generateOrganizationSchema,
 } from './utils/seo';
-import {
-  HIGHLIGHT_PRODUCTS,
-  VITAPLEX_OFFER_PRODUCTS,
-  NEW_ARRIVALS,
-  BEST_SELLER_PRODUCTS,
-  POPULAR_PRODUCTS,
-  ARTICLES,
-} from './data/mockData';
+import { productService } from './services/productService';
+import { blogService } from './services/blogService';
 import {
   getProductSlug,
-  findProductBySlug,
   getCategorySlug,
-  getCategoryNameFromSlug,
   navigateTo,
 } from './utils/router';
 
 export default function App() {
-  // Master product list
-  const allProducts = useMemo(() => {
-    const map = new Map<string, Product>();
-    [
-      ...HIGHLIGHT_PRODUCTS,
-      ...VITAPLEX_OFFER_PRODUCTS,
-      ...NEW_ARRIVALS,
-      ...BEST_SELLER_PRODUCTS,
-      ...POPULAR_PRODUCTS,
-    ].forEach((p) => map.set(p.id, p));
-    return Array.from(map.values());
-  }, []);
+  const [activeProductDetail, setActiveProductDetail] = useState<Product | null>(null);
+  const [activeArticleDetail, setActiveArticleDetail] = useState<Article | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+  const [routeError, setRouteError] = useState(false);
+  const allProducts = useMemo<Product[]>(() => [], []);
 
   // Shopping Cart state
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      product: HIGHLIGHT_PRODUCTS[0],
-      quantity: 1,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // Wishlist state
-  const [wishlistIds, setWishlistIds] = useState<string[]>(['hl-2']);
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
 
   // Modals state
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -205,8 +185,6 @@ export default function App() {
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // Route Parser Resolution logic
-  let activeProductDetail: Product | null = null;
-  let activeArticleDetail: Article | null = null;
   let isShopActive = false;
   let isMagazineActive = false;
   let shopCategoryFilter = '';
@@ -214,13 +192,38 @@ export default function App() {
   let shopQueryFilter = '';
 
   const normPath = currentPath.split('#')[0].split('?')[0].replace(/\/+$/, '') || '/';
+  const queryParams = new URLSearchParams(window.location.search);
+  shopQueryFilter = queryParams.get('q') || queryParams.get('search') || '';
+
+  useEffect(() => {
+    let ignore = false;
+    setActiveProductDetail(null);
+    setActiveArticleDetail(null);
+    setRouteError(false);
+
+    if (normPath.startsWith('/products/')) {
+      const slug = normPath.replace('/products/', '');
+      setRouteLoading(true);
+      productService.getProductBySlug(slug)
+        .then((product) => { if (!ignore) setActiveProductDetail(product); })
+        .catch(() => { if (!ignore) setRouteError(true); })
+        .finally(() => { if (!ignore) setRouteLoading(false); });
+    } else if (normPath.startsWith('/blog/')) {
+      const slug = normPath.replace('/blog/', '');
+      setRouteLoading(true);
+      blogService.getArticleBySlug(slug)
+        .then((article) => { if (!ignore) setActiveArticleDetail(article); })
+        .catch(() => { if (!ignore) setRouteError(true); })
+        .finally(() => { if (!ignore) setRouteLoading(false); });
+    }
+
+    return () => { ignore = true; };
+  }, [normPath]);
 
   if (normPath.startsWith('/products/')) {
-    const slug = normPath.replace('/products/', '');
-    activeProductDetail = findProductBySlug(slug, allProducts) || allProducts[0];
+    // Product detail is loaded from the API effect above.
   } else if (normPath.startsWith('/blog/')) {
-    const id = normPath.replace('/blog/', '');
-    activeArticleDetail = ARTICLES.find((a) => a.id === id) || ARTICLES[0];
+    // Article detail is loaded from the API effect above.
   } else if (
     normPath === '/magazine' ||
     normPath === '/blog' ||
@@ -236,13 +239,11 @@ export default function App() {
   ) {
     isMagazineActive = true;
   } else if (normPath.startsWith('/categories/')) {
-    const slug = normPath.replace('/categories/', '');
     isShopActive = true;
-    shopCategoryFilter = getCategoryNameFromSlug(slug);
+    shopCategoryFilter = normPath.replace('/categories/', '');
   } else if (normPath.startsWith('/brands/')) {
-    const slug = normPath.replace('/brands/', '');
     isShopActive = true;
-    shopBrandFilter = getCategoryNameFromSlug(slug);
+    shopBrandFilter = normPath.replace('/brands/', '');
   } else if (normPath === '/shop' || normPath.startsWith('/shop')) {
     isShopActive = true;
   }
@@ -279,7 +280,7 @@ export default function App() {
       ],
     };
   } else if (activeArticleDetail) {
-    const canonical = getCanonicalUrl('/blog/' + activeArticleDetail.id);
+    const canonical = getCanonicalUrl('/blog/' + (activeArticleDetail.slug || activeArticleDetail.id));
     seoData = {
       title: activeArticleDetail.seoTitle || `${activeArticleDetail.title} | مجله سلامت نوژاشاپ`,
       description: activeArticleDetail.seoDescription || activeArticleDetail.summary,
@@ -290,12 +291,12 @@ export default function App() {
       breadcrumbs: [
         { name: 'مجله سلامت', url: '/magazine' },
         { name: activeArticleDetail.category, url: '/magazine' },
-        { name: activeArticleDetail.title, url: '/blog/' + activeArticleDetail.id },
+        { name: activeArticleDetail.title, url: '/blog/' + (activeArticleDetail.slug || activeArticleDetail.id) },
       ],
     };
   } else if (normPath.startsWith('/categories/')) {
     const catSlug = normPath.replace('/categories/', '');
-    const catName = shopCategoryFilter || getCategoryNameFromSlug(catSlug);
+    const catName = shopCategoryFilter || catSlug;
     const canonical = getCanonicalUrl('/categories/' + catSlug);
     const desc = `خرید آنلاین و لیست قیمت انواع محصولات ${catName} با ضمانت اصالت کالا، مشاوره تخصصی و ارسال رایگان از داروخانه آنلاین نوژاشاپ.`;
     seoData = {
@@ -311,7 +312,7 @@ export default function App() {
     };
   } else if (normPath.startsWith('/brands/')) {
     const brandSlug = normPath.replace('/brands/', '');
-    const brandName = shopBrandFilter || getCategoryNameFromSlug(brandSlug);
+    const brandName = shopBrandFilter || brandSlug;
     const canonical = getCanonicalUrl('/brands/' + brandSlug);
     const desc = `خرید محصولات آنلاین برند ${brandName} اصل با برچسب اصالت سازمان غذا و دارو، بهترین قیمت و تخفیف ویژه در نوژاشاپ.`;
     seoData = {
@@ -404,7 +405,11 @@ export default function App() {
 
       {/* Main Content View Switcher */}
       <main className="flex-1 w-full overflow-x-hidden pt-20 md:pt-32 lg:pt-36">
-        {activeProductDetail ? (
+        {routeLoading ? (
+          <div className="max-w-[1240px] mx-auto px-4 py-16 text-center text-slate-500">در حال دریافت اطلاعات...</div>
+        ) : routeError ? (
+          <div className="max-w-[1240px] mx-auto px-4 py-16 text-center text-rose-600">خطا در دریافت اطلاعات. <button onClick={() => window.location.reload()} className="underline font-bold">تلاش مجدد</button></div>
+        ) : activeProductDetail ? (
           <ProductDetailPage
             product={activeProductDetail}
             allProducts={allProducts}
@@ -418,10 +423,10 @@ export default function App() {
         ) : activeArticleDetail ? (
           <BlogDetailPage
             article={activeArticleDetail}
-            allArticles={ARTICLES}
-            relatedProducts={allProducts.slice(0, 4)}
+            allArticles={[]}
+            relatedProducts={[]}
             onBack={() => navigateTo('/')}
-            onSelectArticle={(art) => navigateTo('/blog/' + art.id)}
+            onSelectArticle={(art) => navigateTo('/blog/' + (art.slug || art.id))}
             onSelectProduct={handleSelectProduct}
             onAddToCart={handleAddToCart}
             onShowToast={showToast}
@@ -429,7 +434,7 @@ export default function App() {
         ) : isMagazineActive ? (
           <MagazinePage
             allProducts={allProducts}
-            onSelectArticle={(art) => navigateTo('/blog/' + art.id)}
+            onSelectArticle={(art) => navigateTo('/blog/' + (art.slug || art.id))}
             onBackToHome={() => navigateTo('/')}
             onSelectProduct={handleSelectProduct}
             onAddToCart={handleAddToCart}
@@ -437,8 +442,7 @@ export default function App() {
           />
         ) : isShopActive ? (
           <ShopPage
-            products={allProducts}
-            initialCategory={shopCategoryFilter}
+                        initialCategory={shopCategoryFilter}
             initialBrand={shopBrandFilter}
             initialQuery={shopQueryFilter}
             onBackToHome={() => navigateTo('/')}
@@ -536,7 +540,7 @@ export default function App() {
 
             {/* Health Magazine / Blog */}
             <HealthMagazine
-              onSelectArticle={(art) => navigateTo('/blog/' + art.id)}
+              onSelectArticle={(art) => navigateTo('/blog/' + (art.slug || art.id))}
               onNavigateMagazine={() => navigateTo('/magazine')}
             />
           </>
@@ -577,8 +581,7 @@ export default function App() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        products={allProducts}
-        onSelectProduct={(p) => {
+                onSelectProduct={(p) => {
           setIsSearchOpen(false);
           handleSelectProduct(p);
         }}

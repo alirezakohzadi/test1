@@ -7,13 +7,17 @@ import {
 } from '../types';
 import { mapDjangoProductToUI } from './dataMappers';
 
+function normalizeProductList(response: DjangoProduct[] | DjangoPaginatedResponse<DjangoProduct>): DjangoProduct[] {
+  return Array.isArray(response) ? response : response.results || [];
+}
+
 export const productService = {
   /**
    * Fetch paginated products list with filtering, searching, and sorting from Django REST API
    * Designed for 14,000+ catalog items with server-side pagination
    */
   async getProducts(params?: ProductFilterParams): Promise<DjangoPaginatedResponse<Product>> {
-    const response = await apiClient.get<DjangoPaginatedResponse<DjangoProduct>>('/v1/products/', params);
+    const response = await apiClient.get<DjangoPaginatedResponse<DjangoProduct>>('/products/', params);
     return {
       ...response,
       results: response.results.map(mapDjangoProductToUI),
@@ -25,7 +29,7 @@ export const productService = {
    */
   async getProductBySlug(slugOrId: string): Promise<Product | null> {
     try {
-      const response = await apiClient.get<DjangoProduct>(`/v1/products/${slugOrId}/`);
+      const response = await apiClient.get<DjangoProduct>(`/products/${slugOrId}/`);
       return mapDjangoProductToUI(response);
     } catch (err: any) {
       if (err?.status === 404) {
@@ -39,31 +43,31 @@ export const productService = {
    * Fetch related products for a product
    */
   async getRelatedProducts(slugOrId: string): Promise<Product[]> {
-    const response = await apiClient.get<DjangoProduct[]>(`/v1/products/${slugOrId}/related/`);
-    return response.map(mapDjangoProductToUI);
+    const response = await apiClient.get<DjangoProduct[] | DjangoPaginatedResponse<DjangoProduct>>(`/products/${slugOrId}/related/`);
+    return normalizeProductList(response).map(mapDjangoProductToUI);
   },
 
   /**
    * Fetch highlight / golden offer products
    */
   async getFeaturedProducts(): Promise<Product[]> {
-    const response = await apiClient.get<DjangoProduct[]>('/v1/products/featured/');
-    return response.map(mapDjangoProductToUI);
+    const response = await apiClient.get<DjangoProduct[] | DjangoPaginatedResponse<DjangoProduct>>('/products/featured/');
+    return normalizeProductList(response).map(mapDjangoProductToUI);
   },
 
   /**
    * Fetch new arrivals
    */
   async getNewArrivals(): Promise<Product[]> {
-    const response = await apiClient.get<DjangoProduct[]>('/v1/products/new-arrivals/');
-    return response.map(mapDjangoProductToUI);
+    const response = await apiClient.get<DjangoProduct[] | DjangoPaginatedResponse<DjangoProduct>>('/products/new-arrivals/');
+    return normalizeProductList(response).map(mapDjangoProductToUI);
   },
 
   /**
    * Fetch best seller / popular products
    */
   async getBestSellers(): Promise<Product[]> {
-    const response = await apiClient.get<DjangoProduct[]>('/v1/products/best-sellers/');
-    return response.map(mapDjangoProductToUI);
+    const response = await apiClient.get<DjangoProduct[] | DjangoPaginatedResponse<DjangoProduct>>('/products/best-sellers/');
+    return normalizeProductList(response).map(mapDjangoProductToUI);
   },
 };

@@ -93,6 +93,7 @@ export interface Brand {
   name: string;
   logo: string;
   persianName: string;
+  slug?: string;
   description?: string;
   seoTitle?: string;
   seoDescription?: string;

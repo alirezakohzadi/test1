@@ -1,6 +1,6 @@
 import { DjangoCategory, DjangoCategoryListResponse } from '../types';
-import { MOCK_DJANGO_CATEGORIES } from './mockDjangoCategories';
 import { apiClient } from './apiClient';
+import { resolveMediaUrl } from '../utils/media';
 
 const CATEGORY_CACHE_KEY = 'nozha_categories_cache_v1';
 const CATEGORY_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
@@ -16,12 +16,21 @@ let flattenedCategoryMap: Map<string | number, DjangoCategory> | null = null;
 /**
  * Normalizes raw response from Django REST Framework endpoint.
  */
+function normalizeCategory(cat: DjangoCategory): DjangoCategory {
+  return {
+    ...cat,
+    image: resolveMediaUrl(cat.image),
+    og_image: resolveMediaUrl(cat.og_image),
+    children: cat.children?.map(normalizeCategory),
+  };
+}
+
 function normalizeDjangoResponse(data: unknown): DjangoCategory[] {
   if (Array.isArray(data)) {
-    return data as DjangoCategory[];
+    return (data as DjangoCategory[]).map(normalizeCategory);
   }
   if (data && typeof data === 'object' && 'results' in data && Array.isArray((data as DjangoCategoryListResponse).results)) {
-    return (data as DjangoCategoryListResponse).results || [];
+    return ((data as DjangoCategoryListResponse).results || []).map(normalizeCategory);
   }
   return [];
 }
@@ -41,9 +50,9 @@ function buildCategoryMap(categories: DjangoCategory[], map = new Map<string | n
 }
 
 /**
- * Fetches category tree from Django REST API with caching & mock fallback
+ * Fetches category tree from Django REST API with caching; no mock fallback is used
  */
-export async function fetchCategoriesFromApi(customUrl?: string): Promise<DjangoCategory[]> {
+export async function fetchCategoriesFromApi(_customUrl?: string): Promise<DjangoCategory[]> {
   const now = Date.now();
 
   // 1. Check in-memory cache first
@@ -69,7 +78,7 @@ export async function fetchCategoriesFromApi(customUrl?: string): Promise<Django
   }
 
   // 3. Request API
-  const rawJson = await apiClient.get<unknown>('/v1/categories/');
+  const rawJson = await apiClient.get<unknown>('/categories/');
   const categories = normalizeDjangoResponse(rawJson);
 
   if (categories.length > 0) {
@@ -142,7 +151,8 @@ export const categoryService = {
   getCategories: fetchCategoriesFromApi,
   getCategoryBySlug: async (slug: string): Promise<DjangoCategory | null> => {
     try {
-      return await apiClient.get<DjangoCategory>(`/v1/categories/${slug}/`);
+      const category = await apiClient.get<DjangoCategory>(`/categories/${slug}/`);
+      return normalizeCategory(category);
     } catch (err: any) {
       if (err?.status === 404) {
         return null;

@@ -26,7 +26,6 @@ import {
   MessageSquare,
   AlertCircle
 } from 'lucide-react';
-import { ARTICLES } from '../data/mockData';
 import { Article, Product } from '../types';
 import { blogService } from '../services/blogService';
 
@@ -218,7 +217,7 @@ export const MagazinePage: React.FC<MagazinePageProps> = ({
   }, [loadArticles]);
 
   // Featured Hero Article
-  const heroArticle = articlesList[0] || ARTICLES[0];
+  const heroArticle = articlesList[0] || null;
 
   // Filtered Articles
   const filteredArticles = articlesList.filter((art) => {
@@ -667,7 +666,7 @@ export const MagazinePage: React.FC<MagazinePageProps> = ({
                     تکرار مجدد تست
                   </button>
                   <button
-                    onClick={() => onSelectArticle(ARTICLES[0])}
+                    onClick={() => heroArticle && onSelectArticle(heroArticle)}
                     className="bg-[#0D7366] text-white text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-[#0b6257]"
                   >
                     مطالعه مقاله روتین اختصاصی شما 👈
